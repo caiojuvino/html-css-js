@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      progress {
+        min-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <progress value="0" max="60"></progress><br />
+    <span></span>
+
+    <script>
+      var fps = 30;
+      var now;
+      var then = Date.now();
+      var interval = 1000 / fps;
+      var delta;
+
+      function draw() {
+        window.requestAnimationFrame(draw);
+
+        now = Date.now();
+        delta = now - then;
+
+        if (delta > interval) {
+          then = now - (delta % interval);
+
+          date = new Date();
+          seconds = date.getSeconds();
+          millis = date.getMilliseconds();
+          document.querySelector("span").textContent = `${seconds}.${millis}`;
+
+          secondspercentage = (seconds + (millis/1000))
+
+          document
+            .querySelector("progress")
+            .setAttribute("value", secondspercentage );
+        }
+      }
+
+      draw();
+    </script>
+  </body>
+</html>

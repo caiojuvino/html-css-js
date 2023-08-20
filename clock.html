@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Clock</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 25px;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+      }
+      #grid {
+        margin: auto;
+        width: 90%;
+        display: grid;
+      }
+      #header {
+        display: flex;
+        justify-content: center;
+      }
+      #subgrid {
+        display: grid;
+        grid-template-columns: 1fr min-content min-content;
+        grid-column-gap: 1em;
+      }
+      #subgrid > div {
+        display: flex;
+      }
+      #subgrid > div:nth-child(3n) {
+        justify-content: end;
+      }
+      progress {
+        min-width: 100%;
+      }
+      progress[value] {
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      progress[value]::-webkit-progress-bar {
+        background-image: -webkit-linear-gradient(
+          left,
+          rgb(0, 255, 0) 0%,
+          rgb(255, 255, 0) 50%,
+          rgb(255, 0, 0) 100%
+        );
+        border: gray 1px solid;
+      }
+      progress[value]::-webkit-progress-value {
+        background-color: gray;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="grid">
+      <div id="header">
+        <span id="time_spam">
+          <span id="year_span"> </span>/<span id="months_span"> </span>/<span
+            id="dates_span"
+          >
+          </span>
+          <span id="days_span"> </span> <span id="hours_span"> </span>:<span
+            id="minutes_span"
+          >
+          </span
+          >:<span id="seconds_span"> </span>.<span id="millis_span"> </span>
+        </span>
+      </div>
+      <div id="subgrid">
+        <div><progress id="months_bar" value="0" max="12"></progress></div>
+        <div>Year:</div>
+        <div><span id="months_%"></span>%</div>
+
+        <div><progress id="dates_bar" value="0" max="31"></progress></div>
+        <div>Month:</div>
+        <div><span id="dates_%"></span>%</div>
+
+        <div><progress id="days_bar" value="0" max="7"></progress></div>
+        <div>Week:</div>
+        <div><span id="days_%"></span>%</div>
+
+        <div><progress id="hours_bar" value="0" max="24"></progress></div>
+        <div>Day:</div>
+        <div><span id="hours_%"></span>%</div>
+
+        <div><progress id="minutes_bar" value="0" max="60"></progress></div>
+        <div>Hour:</div>
+        <div><span id="minutes_%"></span>%</div>
+
+        <div><progress id="seconds_bar" value="0" max="60"></progress></div>
+        <div>Minute:</div>
+        <div><span id="seconds_%"></span>%</div>
+
+        <div><progress id="millis_bar" value="0" max="1000"></progress></div>
+        <div>Second:</div>
+        <div><span id="millis_%"></span>%</div>
+      </div>
+    </div>
+
+    <script>
+      days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+      function getDaysInMonth(year, month) {
+        return new Date(year, month, 0).getDate();
+      }
+
+      function setBarValue(barId, barValue) {
+        document.getElementById(barId).value = barValue.toFixed(3);
+      }
+
+      function setTimeSpanText(spanId, spanValue, padding) {
+        document.getElementById(spanId).textContent = spanValue
+          .toString()
+          .padStart(padding, "0");
+      }
+
+      function setPercentageText(type, value) {
+        max = document.getElementById(`${type}_bar`).max;
+        document.getElementById(`${type}_%`).textContent = (
+          (value / max) *
+          100
+        ).toFixed(2);
+      }
+
+      function step() {
+        now = new Date();
+
+        year = now.getFullYear();
+        month = now.getMonth();
+        date = now.getDate();
+        day = now.getDay();
+        hours = now.getHours();
+        minutes = now.getMinutes();
+        seconds = now.getSeconds();
+        millis = now.getMilliseconds();
+
+        // date ajustment
+        daysInMonth = getDaysInMonth(year, month);
+        document.getElementById("dates_bar").max = daysInMonth;
+
+        setTimeSpanText("year_span", year, 4);
+        // month ajustment
+        setTimeSpanText("months_span", month + 1, 2);
+        setTimeSpanText("dates_span", date, 2);
+
+        document.getElementById("days_span").textContent = days[day];
+
+        setTimeSpanText("hours_span", hours, 2);
+        setTimeSpanText("minutes_span", minutes, 2);
+        setTimeSpanText("seconds_span", seconds, 2);
+        setTimeSpanText("millis_span", millis, 3);
+
+        secondsValue = seconds + millis / 1000;
+        minutesValue = minutes + secondsValue / 60;
+        hoursValue = hours + minutesValue / 60;
+        hoursRatio = hoursValue / 24;
+        daysValue = day + hoursRatio;
+        // date ajustment
+        datesValue = date - 1 + hoursRatio;
+        monthsValue = month + datesValue / daysInMonth;
+
+        setBarValue("millis_bar", millis);
+        setBarValue("seconds_bar", secondsValue);
+        setBarValue("minutes_bar", minutesValue);
+        setBarValue("hours_bar", hoursValue);
+        setBarValue("days_bar", daysValue);
+        setBarValue("dates_bar", datesValue);
+        setBarValue("months_bar", monthsValue);
+
+        setPercentageText("millis", millis);
+        setPercentageText("seconds", secondsValue);
+        setPercentageText("minutes", minutesValue);
+        setPercentageText("hours", hoursValue);
+        setPercentageText("days", daysValue);
+        setPercentageText("dates", datesValue);
+        setPercentageText("months", monthsValue);
+
+        window.requestAnimationFrame(step);
+      }
+
+      window.requestAnimationFrame(step);
+    </script>
+  </body>
+</html>
