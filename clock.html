@@ -107,7 +107,8 @@
       days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
       function getDaysInMonth(year, month) {
-        return new Date(year, month, 0).getDate();
+        const monthLastDate = new Date(year, month + 1, 0);
+        return monthLastDate.getDate();
       }
 
       function setBarValue(barId, barValue) {

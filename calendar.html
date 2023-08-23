@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calendar</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 1.2vw;
+      }
+      :root {
+        --bcolor: gray;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+      }
+      #main {
+        margin: auto;
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+      }
+      #year {
+        align-self: center;
+        margin-bottom: 1vw;
+      }
+      #calendar {
+        border-left: var(--bcolor) 1px solid;
+        border-top: var(--bcolor) 1px solid;
+
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .month {
+        border-right: var(--bcolor) 1px solid;
+        border-bottom: var(--bcolor) 1px solid;
+        display: flex;
+        flex-direction: column;
+      }
+      .month > span {
+        align-self: center;
+        font-weight: bold;
+      }
+      .days {
+        border-top: var(--bcolor) 1px solid;
+        border-bottom: var(--bcolor) 1px solid;
+      }
+      .days {
+        display: flex;
+        margin-bottom: 0.25vw;
+      }
+      .days > div {
+        flex: 1;
+        text-align: center;
+      }
+      .dates {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+      }
+      .dates > div {
+        text-align: center;
+      }
+      .days > div:nth-of-type(7n + 1),
+      .dates > div:nth-of-type(7n + 1) {
+        color: red;
+      }
+      .days > div:nth-of-type(7n),
+      .dates > div:nth-of-type(7n) {
+        color: blue;
+      }
+      .month > span,
+      .days > div {
+        padding: 0.25vw;
+      }
+      .dates > div {
+        margin-bottom: 0.25vw;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="main">
+      <div id="year">
+        Year:
+        <input
+          id="view_input"
+          type="number"
+          inputmode="numeric"
+          min="0"
+          step="1"
+          value="2023"
+        />
+        <input id="view_btn" type="submit" value="View" />
+      </div>
+
+      <div id="calendar">
+        <div class="month">
+          <span>January</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>February</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>March</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>April</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>May</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>June</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>July</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>August</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>September</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>October</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>May</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+        <div class="month">
+          <span>December</span>
+          <div class="days">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+          </div>
+          <div class="dates"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function getDaysInMonth(year, month) {
+        const monthLastDate = new Date(year, month + 1, 0);
+        return monthLastDate.getDate();
+      }
+
+      const viewBtn = document.getElementById("view_btn");
+      viewBtn.addEventListener("click", () => getCalendar());
+
+      function getCalendar() {
+        const year = document.getElementById("view_input").value;
+        const monthDivs = document.querySelectorAll("#calendar .month");
+        let monthCount = 0;
+
+        for (let div of monthDivs) {
+          const datesDiv = div.children.item(2);
+
+          while (datesDiv.firstChild) {
+            datesDiv.removeChild(datesDiv.firstChild);
+          }
+
+          const daysMonth = getDaysInMonth(year, monthCount);
+          const offset = new Date(year, monthCount, 1).getDay();
+
+          for (let i = 0; i < offset; i++) {
+            datesDiv.appendChild(document.createElement("div"));
+          }
+
+          for (let j = 0; j < daysMonth; j++) {
+            const newDiv = document.createElement("div");
+            newDiv.textContent = j + 1;
+            datesDiv.appendChild(newDiv);
+          }
+          monthCount++;
+        }
+      }
+
+      getCalendar();
+    </script>
+  </body>
+</html>
