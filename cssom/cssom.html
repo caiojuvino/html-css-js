@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" type="text/css" href="cssom.css" media="screen" />
+
+    <style>
+      div {
+        color: blue;
+        font-weight: bold;
+      }
+      span {
+        color: yellow;
+        font-weight: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="text-align: left">
+      text1
+      <span>text2</span>
+      <span class="text">text2</span>
+    </div>
+
+    <script>
+      // Info
+      console.log("There is external, internal and inline CSS in this page:");
+      console.log(`  external:`);
+      console.log(document.styleSheets[0]);
+      console.log(`  internal:`);
+      console.log(document.styleSheets[1]);
+      console.log(`  inline:`);
+      console.log(document.getElementsByTagName("div")[0].style);
+
+      //external css rules can't be acessed/modified
+      console.log("External:");
+
+      try {
+        document.styleSheets[0].cssRules;
+      } catch (e) {
+        console.log(`  ${e}`);
+      }
+
+      //getting internal css rules
+      console.log("Internal:");
+
+      for (let rule of document.styleSheets[1].cssRules) {
+        console.log(`  ${rule.selectorText}`);
+        for (let prop of rule.style) {
+          console.log(`    ${prop} : ${rule.style.getPropertyValue(prop)}`);
+        }
+      }
+
+      //setting internal css rules
+      console.log(" > Changing span color to green");
+      document.styleSheets[1].cssRules[1].style.setProperty("color", "green");
+
+      //getting inline css rules
+      console.log("Inline:");
+      tagName = "div";
+      tag = document.getElementsByTagName(tagName)[0];
+      console.log(`  ${tagName}\n    text-align : ${tag.style.textAlign}`);
+
+      //setting inline css rules
+      document.getElementsByTagName("div")[0].style.textDecoration =
+        "underline";
+      console.log(" > Changing div text decoration to underline");
+    </script>
+  </body>
+</html>
