@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clock</title>
     <style>
       * {
@@ -9,7 +10,7 @@
         padding: 0;
         box-sizing: border-box;
         font-family: monospace;
-        font-size: 25px;
+        font-size: 2vw;
       }
       body {
         min-height: 100vh;
@@ -60,12 +61,12 @@
   <body>
     <div id="grid">
       <div id="header">
-        <span id="time_spam">
+        <span id="time_span">
           <span id="year_span"> </span>/<span id="months_span"> </span>/<span
-            id="dates_span"
+            id="monthDates_span"
           >
           </span>
-          <span id="days_span"> </span> <span id="hours_span"> </span>:<span
+          <span id="weekDays_span"> </span> <span id="hours_span"> </span>:<span
             id="minutes_span"
           >
           </span
@@ -73,17 +74,17 @@
         </span>
       </div>
       <div id="subgrid">
-        <div><progress id="months_bar" value="0" max="12"></progress></div>
+        <div><progress id="yearDates_bar" value="0" max="365"></progress></div>
         <div>Year:</div>
-        <div><span id="months_%"></span>%</div>
+        <div><span id="yearDates_%"></span>%</div>
 
-        <div><progress id="dates_bar" value="0" max="31"></progress></div>
+        <div><progress id="monthDates_bar" value="0" max="31"></progress></div>
         <div>Month:</div>
-        <div><span id="dates_%"></span>%</div>
+        <div><span id="monthDates_%"></span>%</div>
 
-        <div><progress id="days_bar" value="0" max="7"></progress></div>
+        <div><progress id="weekDays_bar" value="0" max="7"></progress></div>
         <div>Week:</div>
-        <div><span id="days_%"></span>%</div>
+        <div><span id="weekDays_%"></span>%</div>
 
         <div><progress id="hours_bar" value="0" max="24"></progress></div>
         <div>Day:</div>
@@ -104,87 +105,105 @@
     </div>
 
     <script>
-      days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-      function getDaysInMonth(year, month) {
+      function getDatesInMonth(year, month) {
         const monthLastDate = new Date(year, month + 1, 0);
         return monthLastDate.getDate();
       }
 
-      function setBarValue(barId, barValue) {
-        document.getElementById(barId).value = barValue.toFixed(3);
+      function getPassedYearDates(year, month, monthDatesValue) {
+        totalDays = 0;
+
+        for (let i = 0; i < month; i++) {
+          monthDates = getDatesInMonth(year, i);
+          totalDays += monthDates;
+        }
+        totalDays += monthDatesValue;
+        return totalDays;
       }
 
-      function setTimeSpanText(spanId, spanValue, padding) {
-        document.getElementById(spanId).textContent = spanValue
+      function setTimeSpanText(type, value, padding) {
+        document.getElementById(`${type}_span`).textContent = value
           .toString()
           .padStart(padding, "0");
       }
 
-      function setPercentageText(type, value) {
-        max = document.getElementById(`${type}_bar`).max;
+      function setBarValue(type, value) {
+        bar = document.getElementById(`${type}_bar`);
+        bar.value = value.toFixed(3);
+
+        max = bar.max;
         document.getElementById(`${type}_%`).textContent = (
           (value / max) *
           100
         ).toFixed(2);
       }
 
+      debugPrint = true;
+      weekDaysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
       function step() {
         now = new Date();
 
-        year = now.getFullYear();
-        month = now.getMonth();
-        date = now.getDate();
-        day = now.getDay();
-        hours = now.getHours();
-        minutes = now.getMinutes();
-        seconds = now.getSeconds();
-        millis = now.getMilliseconds();
+        year = now.getFullYear(); //(yyyy) 1-indexed
+        months = now.getMonth(); // (0-11)
+        monthDates = now.getDate(); // (1-31)
+        weekDays = now.getDay(); // (0-6)
+        hours = now.getHours(); // (0-23)
+        minutes = now.getMinutes(); // (0-59)
+        seconds = now.getSeconds(); // (0-59)
+        millis = now.getMilliseconds(); // (0-999)
 
-        // date ajustment
-        daysInMonth = getDaysInMonth(year, month);
-        document.getElementById("dates_bar").max = daysInMonth;
+        // yearDates_bar ajustment
+        document.getElementById("yearDates_bar").max =
+          new Date(year, 2, 0).getDate() == 29 ? 366 : 365;
 
-        setTimeSpanText("year_span", year, 4);
-        // month ajustment
-        setTimeSpanText("months_span", month + 1, 2);
-        setTimeSpanText("dates_span", date, 2);
+        // monthDates_bar ajustment
+        datesInMonth = getDatesInMonth(year, months);
+        document.getElementById("monthDates_bar").max = datesInMonth;
 
-        document.getElementById("days_span").textContent = days[day];
-
-        setTimeSpanText("hours_span", hours, 2);
-        setTimeSpanText("minutes_span", minutes, 2);
-        setTimeSpanText("seconds_span", seconds, 2);
-        setTimeSpanText("millis_span", millis, 3);
+        setTimeSpanText("year", year, 4);
+        // months_span ajustment
+        setTimeSpanText("months", months + 1, 2);
+        setTimeSpanText("monthDates", monthDates, 2);
+        setTimeSpanText("weekDays", weekDaysMap[weekDays], 3);
+        setTimeSpanText("hours", hours, 2);
+        setTimeSpanText("minutes", minutes, 2);
+        setTimeSpanText("seconds", seconds, 2);
+        setTimeSpanText("millis", millis, 3);
 
         secondsValue = seconds + millis / 1000;
         minutesValue = minutes + secondsValue / 60;
         hoursValue = hours + minutesValue / 60;
         hoursRatio = hoursValue / 24;
-        daysValue = day + hoursRatio;
-        // date ajustment
-        datesValue = date - 1 + hoursRatio;
-        monthsValue = month + datesValue / daysInMonth;
+        weekDaysValue = weekDays + hoursRatio;
+        // monthDatesValue ajustment
+        monthDatesValue = monthDates - 1 + hoursRatio;
+        yearDatesValue = getPassedYearDates(year, months, monthDatesValue);
 
-        setBarValue("millis_bar", millis);
-        setBarValue("seconds_bar", secondsValue);
-        setBarValue("minutes_bar", minutesValue);
-        setBarValue("hours_bar", hoursValue);
-        setBarValue("days_bar", daysValue);
-        setBarValue("dates_bar", datesValue);
-        setBarValue("months_bar", monthsValue);
+        setBarValue("millis", millis);
+        setBarValue("seconds", secondsValue);
+        setBarValue("minutes", minutesValue);
+        setBarValue("hours", hoursValue);
+        setBarValue("weekDays", weekDaysValue);
+        setBarValue("monthDates", monthDatesValue);
+        setBarValue("yearDates", yearDatesValue);
 
-        setPercentageText("millis", millis);
-        setPercentageText("seconds", secondsValue);
-        setPercentageText("minutes", minutesValue);
-        setPercentageText("hours", hoursValue);
-        setPercentageText("days", daysValue);
-        setPercentageText("dates", datesValue);
-        setPercentageText("months", monthsValue);
-
+        // DEBUG PRINT ONCE
+        if (debugPrint) {
+          debugPrint = false;
+          console.log(
+            `Now: ${now}\n` +
+            `Year Date:  ${yearDatesValue}\n` +
+            `Month Date: ${monthDatesValue}\n` +
+            `Week Day:   ${weekDaysValue}\n` +
+            `Hour:       ${hoursValue}\n` +
+            `Minutes:    ${minutesValue}\n` +
+            `seconds:    ${secondsValue}\n` +
+            `Milli:      ${millis}\n`
+          );
+        }
         window.requestAnimationFrame(step);
       }
-
       window.requestAnimationFrame(step);
     </script>
   </body>
