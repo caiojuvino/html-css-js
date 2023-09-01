@@ -10,7 +10,7 @@
         padding: 0;
         box-sizing: border-box;
         font-family: monospace;
-        font-size: 2vw;
+        font-size: 3vw;
       }
       body {
         min-height: 100vh;
@@ -20,24 +20,47 @@
         margin: auto;
         width: 90%;
         display: grid;
+        grid-row-gap: 1vh;
       }
       #header {
         display: flex;
         justify-content: center;
       }
-      #subgrid {
-        display: grid;
-        grid-template-columns: 1fr min-content min-content;
-        grid-column-gap: 1em;
+      /* wider than 1:1 */
+      @media (min-aspect-ratio: 1/1) {
+        #subgrid {
+          display: grid;
+          grid-template-columns: 1fr min-content min-content;
+          grid-column-gap: 1.5vw;
+          grid-row-gap: 1vh;
+          align-items: center;
+        }
+        #subgrid > div:nth-child(3n) {
+          justify-content: end;
+        }
+      }
+      /* narrower than 1:1 */
+      @media (max-aspect-ratio: 1/1) {
+        #subgrid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-column-gap: 1.5vw;
+          grid-row-gap: 1vh;
+          align-items: center;
+        }
+        #subgrid > div:nth-child(3n - 5) {
+          grid-column: span 2;
+        }
+        #subgrid > div:nth-child(3n - 4) {
+          justify-content: end;
+        }
       }
       #subgrid > div {
         display: flex;
       }
-      #subgrid > div:nth-child(3n) {
-        justify-content: end;
-      }
       progress {
         min-width: 100%;
+        height: 8vh;
       }
       progress[value] {
         -webkit-appearance: none;
@@ -50,7 +73,7 @@
           rgb(255, 255, 0) 50%,
           rgb(255, 0, 0) 100%
         );
-        border: gray 1px solid;
+        border: gray 2px solid;
       }
       progress[value]::-webkit-progress-value {
         background-color: gray;
@@ -74,31 +97,45 @@
         </span>
       </div>
       <div id="subgrid">
-        <div><progress id="yearDates_bar" value="0" max="365"></progress></div>
+        <div>
+          <progress id="yearDates_bar" value="0" max="365"></progress>
+        </div>
         <div>Year:</div>
         <div><span id="yearDates_%"></span>%</div>
 
-        <div><progress id="monthDates_bar" value="0" max="31"></progress></div>
+        <div>
+          <progress id="monthDates_bar" value="0" max="31"></progress>
+        </div>
         <div>Month:</div>
         <div><span id="monthDates_%"></span>%</div>
 
-        <div><progress id="weekDays_bar" value="0" max="7"></progress></div>
+        <div>
+          <progress id="weekDays_bar" value="0" max="7"></progress>
+        </div>
         <div>Week:</div>
         <div><span id="weekDays_%"></span>%</div>
 
-        <div><progress id="hours_bar" value="0" max="24"></progress></div>
+        <div>
+          <progress id="hours_bar" value="0" max="24"></progress>
+        </div>
         <div>Day:</div>
         <div><span id="hours_%"></span>%</div>
 
-        <div><progress id="minutes_bar" value="0" max="60"></progress></div>
+        <div>
+          <progress id="minutes_bar" value="0" max="60"></progress>
+        </div>
         <div>Hour:</div>
         <div><span id="minutes_%"></span>%</div>
 
-        <div><progress id="seconds_bar" value="0" max="60"></progress></div>
+        <div>
+          <progress id="seconds_bar" value="0" max="60"></progress>
+        </div>
         <div>Minute:</div>
         <div><span id="seconds_%"></span>%</div>
 
-        <div><progress id="millis_bar" value="0" max="1000"></progress></div>
+        <div>
+          <progress id="millis_bar" value="0" max="1000"></progress>
+        </div>
         <div>Second:</div>
         <div><span id="millis_%"></span>%</div>
       </div>
@@ -111,10 +148,10 @@
       }
 
       function getPassedYearDates(year, month, monthDatesValue) {
-        totalDays = 0;
+        let totalDays = 0;
 
         for (let i = 0; i < month; i++) {
-          monthDates = getDatesInMonth(year, i);
+          const monthDates = getDatesInMonth(year, i);
           totalDays += monthDates;
         }
         totalDays += monthDatesValue;
@@ -127,39 +164,53 @@
           .padStart(padding, "0");
       }
 
-      function setBarValue(type, value) {
-        bar = document.getElementById(`${type}_bar`);
-        bar.value = value.toFixed(3);
-
-        max = bar.max;
-        document.getElementById(`${type}_%`).textContent = (
-          (value / max) *
-          100
-        ).toFixed(2);
+      function getBar(type) {
+        return document.getElementById(`${type}_bar`);
       }
 
-      debugPrint = true;
-      weekDaysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      function toDecimalPlaces(value, places) {
+        str = value.toString();
+
+        if (str.includes(".")) {
+          const [part1, part2] = str.split(".");
+          return `${part1}.${part2.slice(0, places).padEnd(places, "0")}`;
+        } else {
+          return `${value}.${"0".repeat(places)}`;
+        }
+      }
+
+      function setBarValue(type, value) {
+        const bar = getBar(type);
+        bar.value = toDecimalPlaces(value, 3);
+
+        const max = bar.max;
+        document.getElementById(`${type}_%`).textContent = toDecimalPlaces(
+          (value / max) * 100,
+          2
+        );
+      }
+
+      var debugPrint = true;
+      const weekDaysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
       function step() {
-        now = new Date();
+        const now = new Date();
 
-        year = now.getFullYear(); //(yyyy) 1-indexed
-        months = now.getMonth(); // (0-11)
-        monthDates = now.getDate(); // (1-31)
-        weekDays = now.getDay(); // (0-6)
-        hours = now.getHours(); // (0-23)
-        minutes = now.getMinutes(); // (0-59)
-        seconds = now.getSeconds(); // (0-59)
-        millis = now.getMilliseconds(); // (0-999)
+        const year = now.getFullYear(); //(yyyy) 1-indexed
+        const months = now.getMonth(); // (0-11)
+        const monthDates = now.getDate(); // (1-31)
+        const weekDays = now.getDay(); // (0-6)
+        const hours = now.getHours(); // (0-23)
+        const minutes = now.getMinutes(); // (0-59)
+        const seconds = now.getSeconds(); // (0-59)
+        const millis = now.getMilliseconds(); // (0-999)
 
         // yearDates_bar ajustment
-        document.getElementById("yearDates_bar").max =
+        getBar("yearDates").max =
           new Date(year, 2, 0).getDate() == 29 ? 366 : 365;
 
         // monthDates_bar ajustment
-        datesInMonth = getDatesInMonth(year, months);
-        document.getElementById("monthDates_bar").max = datesInMonth;
+        getBar("monthDates").max = getDatesInMonth(year, months);
 
         setTimeSpanText("year", year, 4);
         // months_span ajustment
@@ -171,14 +222,18 @@
         setTimeSpanText("seconds", seconds, 2);
         setTimeSpanText("millis", millis, 3);
 
-        secondsValue = seconds + millis / 1000;
-        minutesValue = minutes + secondsValue / 60;
-        hoursValue = hours + minutesValue / 60;
-        hoursRatio = hoursValue / 24;
-        weekDaysValue = weekDays + hoursRatio;
+        const secondsValue = seconds + millis / 1000;
+        const minutesValue = minutes + secondsValue / 60;
+        const hoursValue = hours + minutesValue / 60;
+        const hoursRatio = hoursValue / 24;
+        const weekDaysValue = weekDays + hoursRatio;
         // monthDatesValue ajustment
-        monthDatesValue = monthDates - 1 + hoursRatio;
-        yearDatesValue = getPassedYearDates(year, months, monthDatesValue);
+        const monthDatesValue = monthDates - 1 + hoursRatio;
+        const yearDatesValue = getPassedYearDates(
+          year,
+          months,
+          monthDatesValue
+        );
 
         setBarValue("millis", millis);
         setBarValue("seconds", secondsValue);
@@ -192,14 +247,25 @@
         if (debugPrint) {
           debugPrint = false;
           console.log(
-            `Now: ${now}\n` +
-            `Year Date:  ${yearDatesValue}\n` +
-            `Month Date: ${monthDatesValue}\n` +
-            `Week Day:   ${weekDaysValue}\n` +
-            `Hour:       ${hoursValue}\n` +
-            `Minutes:    ${minutesValue}\n` +
-            `seconds:    ${secondsValue}\n` +
-            `Milli:      ${millis}\n`
+            `Now: ${now.toString().slice(0, 24)}.${millis}\n\n` +
+              ` Year Date: ${yearDatesValue}\n` +
+              `         %: ${
+                (yearDatesValue / getBar("yearDates").max) * 100
+              }\n\n` +
+              `Month Date: ${monthDatesValue}\n` +
+              `         %: ${
+                (monthDatesValue / getBar("monthDates").max) * 100
+              }\n\n` +
+              `  Week Day: ${weekDaysValue}\n` +
+              `         %: ${(weekDaysValue / 7) * 100}\n\n` +
+              `      Hour: ${hoursValue}\n` +
+              `         %: ${(hoursValue / 24) * 100}\n\n` +
+              `   Minutes: ${minutesValue}\n` +
+              `         %: ${(minutesValue / 60) * 100}\n\n` +
+              `   Seconds: ${secondsValue}\n` +
+              `         %: ${(secondsValue / 60) * 100}\n\n` +
+              `     Milli: ${millis}\n` +
+              `         %: ${(millis / 1000) * 100}`
           );
         }
         window.requestAnimationFrame(step);

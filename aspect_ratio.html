@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aspect Ratio</title>
+    <style>
+      /* wider than 1:1 */
+      @media (min-aspect-ratio: 1/1) {
+        body {
+          background-color: yellow;
+        }
+      }
+      /* narrower than 1:1 */
+      @media (max-aspect-ratio: 1/1) {
+        body {
+          background-color: orange;
+        }
+      }
+    </style>
+  </head>
+  <body style="margin:0;padding:0;box-sizing:border-box;min-height:100vh;display:flex;">
+    <!-- https://chipcullen.com/media-query-aspect-ratio/ -->
+    <!-- https://css-tricks.com/a-first-look-at-aspect-ratio/ -->
+    <pre style="margin:auto;font-size:4vw;"></pre>
+
+    <script>
+      styleSheets = document.styleSheets;
+      console.log(`Style Sheets: ${styleSheets.length}`);
+
+      mediaRules = styleSheets[0].cssRules;
+      console.log(`Media Rules: ${mediaRules.length}`);
+
+      preRules = ''
+
+      for (const mr of mediaRules) {
+        console.log(`@media ${mr.conditionText}`);
+        //preRules += mr.cssText;
+
+        preRules = [preRules, `@media ${mr.conditionText}`].join('\n');
+
+        for (let rule of mr.cssRules) {
+          console.log(`    ${rule.selectorText}`);
+          preRules = [preRules, `    ${rule.selectorText}`].join('\n');
+
+          for (let prop of rule.style) {
+            console.log(`        ${prop} : ${rule.style.getPropertyValue(prop)}`);
+            preRules = [preRules, `        ${prop} : ${rule.style.getPropertyValue(prop)}\n`].join('\n');
+          }
+        }
+      }
+      document.getElementsByTagName('pre')[0].innerText = preRules.trim();
+    </script>
+  </body>
+</html>
