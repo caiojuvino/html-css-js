@@ -193,6 +193,10 @@
       var debugPrint = true;
       const weekDaysMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+      window.addEventListener("load", () => {
+        window.requestAnimationFrame(step);
+      });
+
       function step() {
         const now = new Date();
 
@@ -270,7 +274,6 @@
         }
         window.requestAnimationFrame(step);
       }
-      window.requestAnimationFrame(step);
     </script>
   </body>
 </html>

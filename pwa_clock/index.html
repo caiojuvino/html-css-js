@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#afeeee" />
+    <title>PWA</title>
+    <link rel="stylesheet" href="src/master.css" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="images/logo192.png" />
+  </head>
+  <body>
+    <div id="grid">
+      <div id="grid">
+        <div id="header">
+          <span id="time_span">
+            <span id="year_span"> </span>/<span id="months_span"> </span>/<span
+              id="monthDates_span"
+            >
+            </span>
+            <span id="weekDays_span"> </span> <span id="hours_span"> </span>:<span
+              id="minutes_span"
+            >
+            </span
+            >:<span id="seconds_span"> </span>.<span id="millis_span"> </span>
+          </span>
+        </div>
+        <div id="subgrid">
+          <div>
+            <progress id="yearDates_bar" value="0" max="365"></progress>
+          </div>
+          <div>Year:</div>
+          <div><span id="yearDates_%"></span>%</div>
+  
+          <div>
+            <progress id="monthDates_bar" value="0" max="31"></progress>
+          </div>
+          <div>Month:</div>
+          <div><span id="monthDates_%"></span>%</div>
+  
+          <div>
+            <progress id="weekDays_bar" value="0" max="7"></progress>
+          </div>
+          <div>Week:</div>
+          <div><span id="weekDays_%"></span>%</div>
+  
+          <div>
+            <progress id="hours_bar" value="0" max="24"></progress>
+          </div>
+          <div>Day:</div>
+          <div><span id="hours_%"></span>%</div>
+  
+          <div>
+            <progress id="minutes_bar" value="0" max="60"></progress>
+          </div>
+          <div>Hour:</div>
+          <div><span id="minutes_%"></span>%</div>
+  
+          <div>
+            <progress id="seconds_bar" value="0" max="60"></progress>
+          </div>
+          <div>Minute:</div>
+          <div><span id="seconds_%"></span>%</div>
+  
+          <div>
+            <progress id="millis_bar" value="0" max="1000"></progress>
+          </div>
+          <div>Second:</div>
+          <div><span id="millis_%"></span>%</div>
+        </div>
+      </div>
+    <script src="src/index.js"></script>
+  </body>
+</html>
