@@ -1,9 +1,9 @@
 {
-    "name": "example PWA",
-    "short_name": "example PWA",
+    "name": "Bar Clock PWA",
+    "short_name": "Bar Clock PWA",
     "start_url": ".",
     "background_color": "#ffffff",
-    "theme_color": "#afeeee",
+    "theme_color": "#808080",
     "display": "standalone",
     "icons": [
         {
