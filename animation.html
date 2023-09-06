@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation</title>
+
+    <style>
+      :root {
+        --div-width: 25vw;
+        --div-height: 25vh;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+      }
+      div {
+        width: var(--div-width);
+        height: var(--div-height);
+        background-color: red;
+        position: absolute;
+        animation-name: example;
+        animation-duration: 4s;
+        animation-iteration-count: infinite;
+        animation-direction: alternate-reverse;
+        animation-timing-function: linear;
+      }
+      @keyframes example {
+        0% {
+          background-color: blue;
+          top: 0%;
+          left: 0%;
+        }
+        25% {
+          background-color: green;
+          top: 0%;
+          left: calc(100% - var(--div-width));
+        }
+        50% {
+          background-color: yellow;
+          top: calc(100% - var(--div-height));
+          left: calc(100% - var(--div-width));
+        }
+        75% {
+          background-color: red;
+          left: 0%;
+          top: calc(100% - var(--div-height));
+        }
+        100% {
+          background-color: blue;
+          top: 0%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div></div>
+  </body>
+</html>
