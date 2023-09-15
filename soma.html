@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soma</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: 6vw;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+      }
+      body > div {
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      input {
+        text-align: right;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      td {
+        white-space: pre;
+      }
+      tr:nth-of-type(2) {
+        border-bottom: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        type="number"
+        name="num1"
+        id="num1"
+        value="0"
+        min="0"
+        max="4500000000000000"
+        inputmode="numeric"
+      />
+      <input
+        type="number"
+        name="num2"
+        id="num2"
+        value="0"
+        min="0"
+        max="4500000000000000"
+        inputmode="numeric"
+      />
+      <div>
+        <input type="button" value="Somar" id="sum_btn" />
+        <input type="button" value="Limpar" id="clear_btn" />
+      </div>
+      <span id="operation">0</span>
+      <table>
+        <tbody id="rows">
+          <tr id="tr1"></tr>
+          <tr id="tr2"></tr>
+          <tr id="trs"></tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+  <script>
+    function getIntValue(id) {
+      return Math.abs(parseInt(document.getElementById(id).value));
+    }
+    function setIntValue(id, value) {
+      return (document.getElementById(id).value = value);
+    }
+
+    document.getElementById("sum_btn").addEventListener("click", () => {
+      let num1 = getIntValue("num1");
+      let num2 = getIntValue("num2");
+
+      let max = Math.max(num1, num2);
+      let min = Math.min(num1, num2);
+      let sum = num1 + num2;
+      [num1, num2] = [max, min];
+
+      document.getElementById(
+        "operation"
+      ).textContent = `${num1} + ${num2} = ${sum}`;
+
+      let sumLenght = sum.toString().length;
+      console.log(`Sum value lenght: ${sumLenght}`);
+
+      setIntValue("num1", num1);
+      setIntValue("num2", num2);
+
+      const rows = document.getElementById("rows").children;
+
+      for (const row of rows) {
+        row.innerHTML = "<td></td>".repeat(sumLenght + 1);
+        //console.log(row);
+      }
+
+      let nums = [num1, num2, sum];
+
+      for (let r = 0; r < rows.length; r++) {
+        let str = nums[r].toString().padStart(sumLenght + 1, " ");
+        console.log(str);
+
+        for (let i = rows[r].children.length - 1; i >= 0; i--) {
+          rows[r].children.item(i).textContent = str[i];
+          //console.log(i)
+        }
+      }
+      document.querySelector("#tr2 td").textContent = "+";
+    });
+
+    document.getElementById("clear_btn").addEventListener("click", () => {
+      setIntValue("num1", 0);
+      setIntValue("num2", 0);
+      document.getElementById("operation").textContent = "0";
+
+      const rows = document.getElementById("rows").children;
+
+      for (const row of rows) {
+        row.innerHTML = "";
+      }
+    });
+
+    console.log(`Each value must be between 0 and 4500000000000000`);
+  </script>
+</html>
