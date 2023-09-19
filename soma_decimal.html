@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soma</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: monospace;
+        font-size: min(6vw, 8vh);
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+      }
+      body > div {
+        margin: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      input {
+        text-align: right;
+      }
+      #num1,
+      .num1 {
+        color: #000080;
+      }
+      #num2,
+      .num2 {
+        color: #008000;
+      }
+      .carry {
+        color: #888;
+      }
+      table {
+        border-collapse: collapse;
+      }
+      span,
+      td {
+        white-space: pre;
+      }
+      tr:nth-of-type(1) {
+        color: #888;
+      }
+      tr:nth-of-type(2) {
+        color: #000080;
+      }
+      tr:nth-of-type(3) {
+        border-bottom: 0px solid black;
+        color: #008000;
+        & td:nth-of-type(1) {
+          color: #000;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <input
+        type="number"
+        name="num1"
+        id="num1"
+        placeholder="Digite um número"
+        min="0"
+        max="4500000000000000"
+        inputmode="decimal"
+        step="0.01"
+      />
+      <input
+        type="number"
+        name="num2"
+        id="num2"
+        placeholder="Digite um número"
+        min="0"
+        max="4500000000000000"
+        inputmode="decimal"
+        step="0.01"
+      />
+      <div>
+        <input type="button" value="Somar" id="sum_btn" disabled />
+        <input type="button" value="Limpar" id="clear_btn" disabled />
+      </div>
+      <span id="operation"> </span>
+      <table>
+        <tbody id="rows">
+          <tr id="tr0">
+            <td>&nbsp;</td>
+          </tr>
+          <tr id="tr1">
+            <td>&nbsp;</td>
+          </tr>
+          <tr id="tr2">
+            <td>&nbsp;</td>
+          </tr>
+          <tr id="tr3">
+            <td>&nbsp;</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+      const NUM_1_INPUT = document.getElementById("num1");
+      const NUM_2_INPUT = document.getElementById("num2");
+
+      const SUM_BTN = document.getElementById("sum_btn");
+      const CLEAR_BTN = document.getElementById("clear_btn");
+
+      const SPAN = document.getElementById("operation");
+      const ROWS = document.getElementById("rows").children;
+
+      let ongoing = false;
+      let maxLenght;
+      let currentCol;
+      let carry;
+
+      class Num {
+        constructor(strValue) {
+          strValue = strValue.trim();
+
+          if (isNaN(strValue)) {
+            throw new Error("Value is NaN!");
+          }
+          this.int = strValue;
+          this.float = "";
+
+          if (strValue.includes(".")) {
+            let i = strValue.indexOf(".");
+            this.int = strValue.slice(0, i);
+            this.float = strValue.slice(i + 1);
+          }
+        }
+
+        static max(num1, num2) {
+          if (!(num1 instanceof Num) || !(num2 instanceof Num)) {
+            throw new Error("Parameters must be a Num!");
+          }
+
+          if (num1.int.length > num2.int.length) {
+            return num1;
+          } else if (num2.int.length > num1.int.length) {
+            return num2;
+          } else {
+            if (num1.int > num2.int) {
+              return num1;
+            } else if (num2.int > num1.int) {
+              return num2;
+            } else {
+              if (num1.float === num2.float) {
+                return num1;
+              } else {
+                let maxFloatLength = Math.max(
+                  num1.float.length,
+                  num2.float.length
+                );
+                let float1 = num1.float.padEnd(maxFloatLength, " ");
+                let float2 = num2.float.padEnd(maxFloatLength, " ");
+
+                for (let i = 0; i < maxFloatLength; i++) {
+                  if (float1[i] !== " " && float2[i] === " ") {
+                    return num1;
+                  } else if (float2[i] !== " " && float2[1] === " ") {
+                    return num2;
+                  } else {
+                    if (float1[i] > float2[i]) {
+                      return num1;
+                    } else if (float2[i] > float1[i]) {
+                      return num2;
+                    }
+                  }
+                }
+                return num1;
+              }
+            }
+          }
+        }
+
+        toString() {
+          let floatPortion = this.float === "" ? "" : `.${this.float}`;
+          return `${this.int}${floatPortion}`;
+        }
+      }
+
+      function checkInputs(event, otherInput, sumBtn, clearBtn) {
+        let value1Ok = event.target.value != "";
+        let value2Ok = otherInput.value != "";
+        sumBtn.disabled = !(value1Ok && value2Ok);
+        clearBtn.disabled = !(value1Ok || value2Ok);
+      }
+
+      function spanText(class_, content) {
+        return `<span class="${class_}">${content}</span>`;
+      }
+
+      function sumCols(index, carry, span, rows) {
+        const td_num1 = rows[1].children[index].textContent;
+        const td_num2 = rows[2].children[index].textContent;
+        let sum_col =
+          carry + (parseInt(td_num1) || 0) + (parseInt(td_num2) || 0);
+
+        let text = `${spanText("num1", td_num1)} + ${spanText(
+          "num2",
+          td_num2
+        )} = ${sum_col}`;
+
+        let carrySpan = spanText("carry", 1);
+
+        if (carry) {
+          rows[0].children[index].textContent = carry;
+          text = `(${carrySpan} +) ${text}`;
+        }
+
+        if (sum_col >= 10) {
+          sum_col = sum_col.toString().slice(-1);
+          carry = 1;
+          text = `${text} (vai ${carrySpan})`;
+        } else {
+          carry = 0;
+        }
+        span.innerHTML = text;
+        rows[3].children[index].textContent = sum_col;
+
+        return carry;
+      }
+
+      NUM_1_INPUT.addEventListener("input", (e) =>
+        checkInputs(e, NUM_2_INPUT, SUM_BTN, CLEAR_BTN)
+      );
+
+      NUM_2_INPUT.addEventListener("input", (e) =>
+        checkInputs(e, NUM_1_INPUT, SUM_BTN, CLEAR_BTN)
+      );
+
+      SUM_BTN.addEventListener("click", () => {
+        if (!ongoing) {
+          ongoing = true;
+
+          let num1 = new Num(NUM_1_INPUT.value);
+          let num2 = new Num(NUM_2_INPUT.value);
+
+          const MAX = Num.max(num1, num2);
+          const MIN = MAX === num1 ? num2 : num1;
+          const SUM = num1 + num2;
+          console.log(`${num1}+${num2}=${SUM}`);
+
+          [num1, num2] = [MAX, MIN];
+          maxLenght = SUM.toString().length;
+
+          NUM_1_INPUT.value = num1;
+          NUM_2_INPUT.value = num2;
+
+          for (const row of ROWS) {
+            row.innerHTML = "<td></td>".repeat(maxLenght + 2);
+          }
+
+          let nums = ["", num1, num2, ""];
+
+          for (let r = 0; r < ROWS.length; r++) {
+            let str = nums[r].toString().padStart(maxLenght + 2, " ");
+
+            for (let i = ROWS[r].children.length - 1; i >= 0; i--) {
+              ROWS[r].children.item(i).textContent = str[i];
+            }
+          }
+
+          document.querySelector("#tr2 td").textContent = "+";
+          currentCol = 0;
+          carry = 0;
+          NUM_1_INPUT.readOnly = true;
+          NUM_2_INPUT.readOnly = true;
+          ROWS[2].style.borderWidth = "medium";
+        } else {
+          carry = sumCols(maxLenght + 1 - currentCol, carry, SPAN, ROWS);
+          currentCol++;
+
+          if (currentCol >= maxLenght) {
+            console.log("done");
+            SUM_BTN.disabled = true;
+          }
+        }
+      });
+
+      CLEAR_BTN.addEventListener("click", () => {
+        NUM_1_INPUT.readOnly = false;
+        NUM_2_INPUT.readOnly = false;
+        NUM_1_INPUT.value = "";
+        NUM_2_INPUT.value = "";
+
+        SUM_BTN.disabled = true;
+        CLEAR_BTN.disabled = true;
+
+        SPAN.textContent = " ";
+
+        for (const row of ROWS) {
+          row.innerHTML = "<td> </td>";
+        }
+        ROWS[2].style.borderWidth = "0px";
+        ongoing = false;
+      });
+
+      console.log(`Each value must be between 0 and 4500000000000000`);
+    </script>
+  </body>
+</html>
