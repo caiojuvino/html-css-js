@@ -118,6 +118,7 @@
       let maxLenght;
       let currentCol;
       let carry;
+      let signSpace = 2;
       let pointSpace = 1;
 
       class Num {
@@ -317,25 +318,24 @@
           ({max: num1, min: num2, intLength, floatLength,strMax,strMin} = Num.maxMin(num1, num2));
           maxLenght = intLength+floatLength;
 
-          console.log(`${num1} + ${num2}, L = ${maxLenght}`);
-
           NUM_1_INPUT.value = num1.toString();
           NUM_2_INPUT.value = num2.toString();
-
-          for (const row of ROWS) {
-            row.innerHTML = "<td></td>".repeat(maxLenght + 3);
-          }
           
           if (strMax.slice(-1) === "." && strMin.slice(-1) === "." ){
             strMax = strMax.replace(".","");
             strMin = strMin.replace(".","");
             pointSpace = 0;
           }
+          console.log(`${num1} + ${num2}, L = ${maxLenght + pointSpace}`);
+
+          for (const row of ROWS) {
+            row.innerHTML = "<td></td>".repeat(maxLenght + pointSpace + signSpace);
+          }
 
           let nums = ["", strMax, strMin, ""];
 
           for (let r = 0; r < ROWS.length; r++) {
-            let str = nums[r].toString().padStart(maxLenght + 3, " ");
+            let str = nums[r].toString().padStart(maxLenght  + pointSpace + signSpace, " ");
 
             for (let i = ROWS[r].children.length - 1; i >= 0; i--) {
               ROWS[r].children.item(i).textContent = str[i];
@@ -349,10 +349,10 @@
           NUM_2_INPUT.readOnly = true;
           ROWS[2].style.borderWidth = "medium";
         } else {
-          carry = sumCols(maxLenght + 2 - currentCol, carry, SPAN, ROWS);
+          carry = sumCols(maxLenght  + pointSpace + signSpace - 1 - currentCol, carry, SPAN, ROWS);
           currentCol++;
 
-          if (currentCol >= maxLenght + pointSpace) {
+          if (currentCol >= maxLenght + pointSpace && carry === 0) {
             console.log("done");
             SUM_BTN.disabled = true;
           }
@@ -375,6 +375,7 @@
         }
         ROWS[2].style.borderWidth = "0px";
         ongoing = false;
+        pointSpace = 1;
       });
 
       console.log(`Each value must be between 0 and 4500000000000000`);
