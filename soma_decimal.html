@@ -118,6 +118,7 @@
       let maxLenght;
       let currentCol;
       let carry;
+      let pointSpace = 1;
 
       class Num {
         constructor(strValue) {
@@ -134,47 +135,110 @@
             this.int = strValue.slice(0, i);
             this.float = strValue.slice(i + 1);
           }
+          Object.freeze(this);
         }
 
-        static max(num1, num2) {
+        #getInt(char) {
+          return parseInt(char) || 0;
+        }
+
+        #sum(num1, num2) {
+          let sumInt = "";
+          let carry = 0;
+
+          let sumFloat = "";
+
+          let float1 = num1.float;
+          let float2 = num2.float;
+
+          let maxFloatLength = Math.max(float1.length, float2.length);
+
+          float1 = num1.float.padEnd(maxFloatLength, " ");
+          float2 = num2.float.padEnd(maxFloatLength, " ");
+
+          for (let i = maxFloatLength - 1; i >= 0; i--) {
+            let sum = carry + getInt(float1[i]) + getInt(float2[i]);
+            carry = sum > 9 ? 1 : 0;
+            sumFloat = `${sum}${sumFloat}`;
+          }
+
+          for (let i = num1.length - 1; i >= 0; i--) {
+            let sum =
+              parseInt(num1.int) + (num2.int == " " ? 0 : parseInt(num2.int));
+            sumInt = `${sum}${sumInt}`;
+          }
+        }
+
+        static normalize(num, a, b){
+          return `${num.int.padStart(a, " ")}.${num.float.padEnd(b, " ")}`;
+        }
+
+        static maxMin(num1, num2) {
           if (!(num1 instanceof Num) || !(num2 instanceof Num)) {
             throw new Error("Parameters must be a Num!");
           }
 
-          if (num1.int.length > num2.int.length) {
-            return num1;
-          } else if (num2.int.length > num1.int.length) {
-            return num2;
+          let int1 = num1.int;
+          let int2 = num2.int;
+
+          let float1 = num1.float;
+          let float2 = num2.float;
+
+          let maxIntLength = Math.max(int1.length, int2.length);
+          let maxFloatLength = Math.max(float1.length, float2.length);
+
+          let lengths = {intLength: maxIntLength,
+            floatLength: maxFloatLength,
+          };
+
+          let strNum1 = Num.normalize(num1, maxIntLength, maxFloatLength);
+          let strNum2 = Num.normalize(num2, maxIntLength, maxFloatLength);
+
+          let result1 = {
+            max: num1,
+            min: num2,
+            ...lengths,
+            strMax:strNum1,
+            strMin:strNum2
+          };
+          let result2 = {
+            max: num2,
+            min: num1,
+            ...lengths,
+            strMax:strNum2,
+            strMin:strNum1
+          };
+
+          if (int1.length > int2.length) {
+            return result1;
+          } else if (int2.length > int1.length) {
+            return result2;
           } else {
-            if (num1.int > num2.int) {
-              return num1;
-            } else if (num2.int > num1.int) {
-              return num2;
+            if (int1 > int2) {
+              return result1;
+            } else if (int2 > int1) {
+              return result2;
             } else {
-              if (num1.float === num2.float) {
-                return num1;
+              if (float1 === float2) {
+                return result1;
               } else {
-                let maxFloatLength = Math.max(
-                  num1.float.length,
-                  num2.float.length
-                );
-                let float1 = num1.float.padEnd(maxFloatLength, " ");
-                let float2 = num2.float.padEnd(maxFloatLength, " ");
+                float1 = float1.padEnd(maxFloatLength, " ");
+                float2 = float2.padEnd(maxFloatLength, " ");
 
                 for (let i = 0; i < maxFloatLength; i++) {
                   if (float1[i] !== " " && float2[i] === " ") {
-                    return num1;
+                    return result1;
                   } else if (float2[i] !== " " && float2[1] === " ") {
-                    return num2;
+                    return result2;
                   } else {
                     if (float1[i] > float2[i]) {
-                      return num1;
+                      return result1;
                     } else if (float2[i] > float1[i]) {
-                      return num2;
+                      return result2;
                     }
                   }
                 }
-                return num1;
+                return result1;
               }
             }
           }
@@ -200,6 +264,12 @@
       function sumCols(index, carry, span, rows) {
         const td_num1 = rows[1].children[index].textContent;
         const td_num2 = rows[2].children[index].textContent;
+
+        if(td_num1 === "." && td_num2 === "."){
+          rows[3].children[index].textContent = ".";
+          return carry;
+        }
+
         let sum_col =
           carry + (parseInt(td_num1) || 0) + (parseInt(td_num2) || 0);
 
@@ -242,26 +312,30 @@
 
           let num1 = new Num(NUM_1_INPUT.value);
           let num2 = new Num(NUM_2_INPUT.value);
+          let intLength,floatLength,strMax,strMin;
 
-          const MAX = Num.max(num1, num2);
-          const MIN = MAX === num1 ? num2 : num1;
-          const SUM = num1 + num2;
-          console.log(`${num1}+${num2}=${SUM}`);
+          ({max: num1, min: num2, intLength, floatLength,strMax,strMin} = Num.maxMin(num1, num2));
+          maxLenght = intLength+floatLength;
 
-          [num1, num2] = [MAX, MIN];
-          maxLenght = SUM.toString().length;
+          console.log(`${num1} + ${num2}, L = ${maxLenght}`);
 
-          NUM_1_INPUT.value = num1;
-          NUM_2_INPUT.value = num2;
+          NUM_1_INPUT.value = num1.toString();
+          NUM_2_INPUT.value = num2.toString();
 
           for (const row of ROWS) {
-            row.innerHTML = "<td></td>".repeat(maxLenght + 2);
+            row.innerHTML = "<td></td>".repeat(maxLenght + 3);
+          }
+          
+          if (strMax.slice(-1) === "." && strMin.slice(-1) === "." ){
+            strMax = strMax.replace(".","");
+            strMin = strMin.replace(".","");
+            pointSpace = 0;
           }
 
-          let nums = ["", num1, num2, ""];
+          let nums = ["", strMax, strMin, ""];
 
           for (let r = 0; r < ROWS.length; r++) {
-            let str = nums[r].toString().padStart(maxLenght + 2, " ");
+            let str = nums[r].toString().padStart(maxLenght + 3, " ");
 
             for (let i = ROWS[r].children.length - 1; i >= 0; i--) {
               ROWS[r].children.item(i).textContent = str[i];
@@ -275,10 +349,10 @@
           NUM_2_INPUT.readOnly = true;
           ROWS[2].style.borderWidth = "medium";
         } else {
-          carry = sumCols(maxLenght + 1 - currentCol, carry, SPAN, ROWS);
+          carry = sumCols(maxLenght + 2 - currentCol, carry, SPAN, ROWS);
           currentCol++;
 
-          if (currentCol >= maxLenght) {
+          if (currentCol >= maxLenght + pointSpace) {
             console.log("done");
             SUM_BTN.disabled = true;
           }
